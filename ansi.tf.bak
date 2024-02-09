@@ -1,0 +1,15 @@
+#playbook for ansible
+resource "null_resource" "ssh" {
+  provisioner "local-exec" {
+    command = <<EOF
+      echo "[ncloud]" > inventory
+      echo "${ncloud_server.create_pub_sv[0].name} ansible_host='${ncloud_public_ip.public-ip[0].public_ip}' ansible_port=22 ansible_ssh_user=root ansible_ssh_pass='${data.ncloud_root_password.root_passwd.root_password}'" >> inventory
+EOF
+  }
+  provisioner "local-exec" {
+    command = <<EOF
+      ANSIBLE_HOST_KEY_CHECKING=False \
+      ansible-playbook -i inventory playbook.yml
+EOF
+  }
+}
